@@ -1,0 +1,19 @@
+/* Tailwind v4 — one import pulls in base, components, utilities */
+/* Reference: https://tailwindcss.com/docs/installation/framework-guides/nextjs */
+@import "tailwindcss";
+
+/* Custom theme tokens — accessed as bg-banana, text-banana, etc. */
+@theme {
+  --color-banana: #f5c518;
+  --color-banana-dark: #c79c0f;
+  --color-bg: #0f0f10;
+  --color-surface: #16161a;
+  --color-border: #26262c;
+  --color-muted: #8b8b94;
+}
+
+html, body {
+  background: var(--color-bg);
+  color: #f5f5f5;
+  font-family: system-ui, -apple-system, sans-serif;
+}
