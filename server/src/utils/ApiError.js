@@ -3,9 +3,10 @@
 // Keeps services free of Express — they only describe "what went wrong"
 // and what status it should map to.
 class ApiError extends Error {
-  constructor(statusCode, message) {
+  constructor(statusCode, message, expose = true) {
     super(message);
     this.statusCode = statusCode;
+    this.expose = expose;
     Error.captureStackTrace(this, this.constructor);
   }
 }

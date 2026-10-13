@@ -18,6 +18,9 @@ model User {
   password  String
   createdAt DateTime @default(now())
 
+  failedLoginCount  Int      @default(0)
+  lockedUntil       DateTime?
+
   scores Score[]
 }
 

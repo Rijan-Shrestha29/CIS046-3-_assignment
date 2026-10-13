@@ -15,8 +15,10 @@ const cookieParser = require('cookie-parser');
 
 const authRoutes = require('./routes/authRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const { globalLimiter, authLimiter } = require('./middleware/rateLimitMiddleware');
 
 const app = express();
+app.disable('x-powered-by');
 
 // --- Middleware stack ---
 app.use(
@@ -46,6 +48,7 @@ app.get('/api/ping', (req, res) => {
 });
 
 // --- Feature routes ---
+app.use('/api', globalLimiter);
 app.use('/api/auth', authRoutes);
 
 // --- Error handling (must be last) ---

@@ -33,3 +33,5 @@ Thumbs.db
 
 # Prisma Studio
 server/prisma/dev.db*
+
+logs/
