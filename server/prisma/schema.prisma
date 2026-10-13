@@ -1,15 +1,37 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// Prisma schema — Banana Game
+// Docs: https://www.prisma.io/docs/orm/prisma-schema/overview
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// --- Theme: Virtual Identity ---
+// Password is always stored as a bcrypt hash, never plaintext.
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  failedLoginCount  Int      @default(0)
+  lockedUntil       DateTime?
+
+  scores Score[]
+}
+
+// --- High score + leaderboard data (feature branch coming later) ---
+model Score {
+  id        Int      @id @default(autoincrement())
+  score     Int
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([score])
+  @@index([userId])
 }

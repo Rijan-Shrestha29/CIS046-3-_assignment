@@ -1,0 +1,12 @@
+// server/src/utils/logger.js
+const fs = require('fs');
+const path = require('path');
+
+const logDir = path.join(__dirname, '..', '..', 'logs');
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+
+const logToFile = (filename, entry) => {
+  fs.appendFileSync(path.join(logDir, filename), JSON.stringify(entry) + '\n');
+};
+
+module.exports = { logToFile };
