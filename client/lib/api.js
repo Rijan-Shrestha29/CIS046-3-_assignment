@@ -51,17 +51,11 @@ export const scoreApi = {
   stats: () => request('/api/scores/stats'),
 };
 
-// --- Banana API (external, third-party, CORS-friendly) ---
-// Docs: http://marcconrad.com/uob/banana/api.php
+// --- Banana API (proxied through our backend to avoid CORS on the upstream) ---
+// The upstream http://marcconrad.com/uob/banana/api.php 301-redirects and
+// does not send the CORS headers browsers require, so we call our own
+// backend which proxies server-to-server.
+// Reference: server/src/routes/bananaRoutes.js
 export const bananaApi = {
-  // Returns { question: "https://.../tXXX.png", solution: 8 }
-  fetchEquation: async () => {
-    // Note: no credentials here — this is a third-party service
-    const res = await fetch('http://marcconrad.com/uob/banana/api.php', {
-      cache: 'no-store',   // every call should return a NEW equation
-    });
-    if (!res.ok) throw new Error('Failed to fetch equation');
-    const data = await res.json();
-    return data; // { question, solution }
-  },
+  fetchEquation: () => request('/api/banana/question'),
 };
