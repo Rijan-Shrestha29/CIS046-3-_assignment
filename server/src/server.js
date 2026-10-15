@@ -14,6 +14,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
 const authRoutes = require('./routes/authRoutes');
+const scoreRoutes = require('./routes/scoreRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const { globalLimiter, authLimiter } = require('./middleware/rateLimitMiddleware');
 
@@ -50,6 +51,7 @@ app.get('/api/ping', (req, res) => {
 // --- Feature routes ---
 app.use('/api', globalLimiter);
 app.use('/api/auth', authRoutes);
+app.use('/api/scores', scoreRoutes);
 
 // --- Error handling (must be last) ---
 app.use(notFound);
