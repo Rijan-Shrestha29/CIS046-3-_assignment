@@ -24,7 +24,7 @@ app.disable('x-powered-by');
 // --- Middleware stack ---
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:4000',
     credentials: true, // allow the browser to send the JWT cookie
   })
 );
