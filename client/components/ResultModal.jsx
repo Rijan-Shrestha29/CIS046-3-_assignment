@@ -4,7 +4,7 @@
 // If the user is logged in, we submit the score automatically.
 // If not, we prompt them to log in to save the score
 // (their score is preserved via ?pendingScore= query on /login).
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { scoreApi } from '@/lib/api';
 
@@ -14,23 +14,32 @@ export default function ResultModal({ score, loggedIn, onRestart }) {
   const [saved, setSaved]   = useState(false);
   const [error, setError]   = useState(null);
 
-  // Auto-submit if logged in
+  // Guards the auto-submit so it fires exactly once per mount,
+  // even with React Strict Mode's double effect invocation.
+  const submittedRef = useRef(false);
+
+  const saveScore = async () => {
+    if (saving) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await scoreApi.submit(score);
+      setSaved(true);
+    } catch (err) {
+      setError(err.message || 'Could not save score');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Auto-submit once for logged-in users.
   useEffect(() => {
     if (!loggedIn) return;
-    let cancelled = false;
-    (async () => {
-      setSaving(true);
-      try {
-        await scoreApi.submit(score);
-        if (!cancelled) setSaved(true);
-      } catch (err) {
-        if (!cancelled) setError(err.message || 'Could not save score');
-      } finally {
-        if (!cancelled) setSaving(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [loggedIn, score]);
+    if (submittedRef.current) return;    // ← the guard
+    submittedRef.current = true;
+    saveScore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn]);
 
   const goToLogin = () => {
     // Preserve the score through the login flow
@@ -48,14 +57,23 @@ export default function ResultModal({ score, loggedIn, onRestart }) {
           <div className="text-xs text-muted mt-1">final score</div>
         </div>
 
+        {/* Save status */}
         {loggedIn && (
-          <div className="text-sm text-center mb-4">
+          <div className="text-sm text-center mb-4 min-h-[1.25rem]">
             {saving && <span className="text-muted">Saving…</span>}
-            {saved && <span className="text-green-400">✅ Score saved to leaderboard</span>}
-            {error && <span className="text-red-400">⚠ {error}</span>}
+            {saved  && <span className="text-green-400">✅ Score saved to leaderboard</span>}
+            {error  && (
+              <span className="text-red-400">
+                ⚠ {error}{' '}
+                <button onClick={saveScore} className="underline ml-1">
+                  Retry
+                </button>
+              </span>
+            )}
           </div>
         )}
 
+        {/* Login-to-save CTA for anonymous users */}
         {!loggedIn && (
           <div className="bg-bg border border-border rounded-xl p-4 mb-4">
             <p className="text-sm text-muted mb-3 text-center">

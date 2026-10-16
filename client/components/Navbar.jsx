@@ -35,8 +35,12 @@ export default function Navbar() {
             <span className="px-3 py-1.5 text-muted">…</span>
           ) : user ? (
             <div className="flex items-center gap-2 ml-2">
-              <span className="text-muted hidden sm:inline">Hi, {user.username}</span>
-              <button
+              <Link
+  href="/profile"
+  className="text-muted hover:text-banana hidden sm:inline transition-colors"
+>
+  Hi, {user.username}
+</Link>              <button
                 onClick={handleLogout}
                 className="px-3 py-1.5 rounded bg-surface-2 hover:bg-border"
               >
