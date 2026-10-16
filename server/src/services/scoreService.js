@@ -70,17 +70,27 @@ const getMyScores = async (userId, { page = 1, pageSize } = {}) => {
   };
 };
 
-// --- Personal high score ---
+// --- Personal summary: high score, total games, average, total points ---
 const getMyHighScore = async (userId) => {
   const result = await prisma.score.aggregate({
     where: { userId },
     _max: { score: true },
+    _min: { score: true },
+    _avg: { score: true },
+    _sum: { score: true },
     _count: { _all: true },
   });
 
+  const gamesPlayed = result._count._all ?? 0;
+
   return {
     highScore: result._max.score ?? 0,
-    gamesPlayed: result._count._all,
+    lowScore: result._min.score ?? 0,
+    averageScore: gamesPlayed
+      ? Math.round((result._avg.score ?? 0) * 10) / 10
+      : 0,
+    totalPoints: result._sum.score ?? 0,
+    gamesPlayed,
   };
 };
 
